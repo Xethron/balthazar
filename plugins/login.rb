@@ -52,7 +52,7 @@ class Login
 
 	# Function to set password
 	def set( nick, user, host, from, msg, arguments, con )
-		if( @config.auth( host, con ) )
+		if( @config.auth( user, host, con ) )
 			if( !arguments.nil? && !arguments.empty? )
 				@password = BCrypt::Password.create arguments
 				writepass

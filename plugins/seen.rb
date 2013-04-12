@@ -58,7 +58,7 @@ class Seen
 			if( con )
 				@output.c( line + "\n" )
 			else
-				@irc.message( from, line )
+				@irc.notice( nick, line )
 			end
 		end
 	end
@@ -91,7 +91,7 @@ class Seen
 			if( con )
 				@output.c( l + "\n" )
 			else
-				@irc.message( from, l )
+				@irc.notice( nick, l )
 			end
 		end
 	end
@@ -124,7 +124,7 @@ class Seen
 			if( con )
 				@output.c( l + "\n" )
 			else
-				@irc.message( from, l )
+				@irc.notice( nick, l )
 			end
 		end
 	end
@@ -166,7 +166,7 @@ class Seen
 
 	# Meta function to force write
 	def write( nick, user, host, from, msg, arguments, con )
-		if( @config.auth( host, con ) )
+		if( @config.auth( user, host, con ) )
 			write_db
 
 			if( con )

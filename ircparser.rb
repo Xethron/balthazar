@@ -5,11 +5,11 @@ require './ircparser_suroutines.rb'
 # Class to parse IRC input
 class IRCParser
 	def initialize( status, config, output, irc, timer )
-		@status		= status
-		@config		= config
-		@output		= output
+		@status	 = status
+		@config	 = config
+		@output	 = output
 		@irc		= irc
-		@timer		= timer
+		@timer	  = timer
 
 		@sub		= IRCSubs.new( status, config, output, irc, timer )
 	end
@@ -27,7 +27,6 @@ class IRCParser
 		# Main IRC parser loop
 		begin
 			while true
-
 				# Set IRC timeout
 				Timeout::timeout( @config.pingtimeout ) do
 					line = @irc.socket.gets
@@ -41,10 +40,12 @@ class IRCParser
 		rescue Timeout::Error
 			@output.debug( "IRC timeout, trying to reconnect.\n" )
 			@irc.disconnect
+			@status.reconnect( 1 )
 		rescue IOError
 			@output.debug( "Socket was closed.\n" )
 		rescue Exception => e
 			@output.debug( "Socket error: " + e.to_s + "\n" )
+			@status.reconnect( 1 )
 		end
 	end
 
@@ -55,12 +56,14 @@ class IRCParser
 		if(@status.debug == 3)
 			puts Thread.new { parser( line ) }.join
 		else
-			Thread.new { parser( line )	}
+			Thread.new { parser( line ) }
 		end
 	end
 
 	# Main parser subroutine
 	def parser( line )
+		@output.good( "\n#{line}\n" )
+	
 		@output.debug_extra( "==> " + line + "\n" )
 
 		# PING
@@ -88,24 +91,45 @@ class IRCParser
 		elsif( line =~ /^\:(.+?)!(.+?)@(.+?) JOIN \:?(.+)/ )
 			@output.debug( "Received join\n" )
 			@sub.join( $1, $2, $3, $4 )
-
+		
 		# PART
-		elsif( line =~ /^\:(.+?)!(.+?)@(.+?) PART (.+)/ )
+		elsif( line =~ /^\:(.+?)!(.+?)@(.+?) PART (.+?)(?: \:(.+)|$)/ )
 			@output.debug( "Received part\n" )
-			@sub.part( $1, $2, $3, $4 )
-
+			@sub.part( $1, $2, $3, $4, $5 )
+		
 		# QUIT
 		elsif( line =~ /^\:(.+?)!(.+?)@(.+?) QUIT \:(.+)/ )
 			@output.debug( "Received quit\n" )
 			@sub.quit( $1, $2, $3, $4 )
+		
+		# NICK
+		elsif( line =~ /^\:(.+?)!(.+?)@(.+?) NICK (.+)/ )
+			@output.debug( "Received rename\n" )
+			@sub.rename( $1, $2, $3, $4 )
 
 		# PRIVMSG
 		elsif( line =~ /^\:(.+?)!(.+?)@(.+?) PRIVMSG (.+?) \:(.+)/ )
 			@output.debug( "Received message\n" )
 			@sub.privmsg( $1, $2, $3, $4, $5 )
-
+		
+		# SERVER MESSAGE
+		elsif( line =~ /^\:.+?\..+? (\d+) .+? (.+)/ )
+			@output.debug( "Server message\n" )
+			@sub.raw( $1.to_i, $2 )
+			
+		# MODE
+		elsif( line =~ /^\:(.+?)!(.+?)@(.+?) MODE (.+?) ([\+|\-].+?)(?: (.+)|$)/ )
+			@output.debug( "Received Mode-change\n" )
+			@sub.mode( $1, $2, $3, $4, $5, $6 )
+		
+		#TOPIC
+		elsif( line =~ /^\:(.+?)!(.+?)@(.+?) TOPIC \:(.+)/ )
+			@output.debug( "Received topic\n" )
+			@sub.topicset( $1, $2, $3, $4 )
+			
 		# Other stuff
 		else
+			#@output.good( "\n#{line}\n" )
 			@sub.misc( line )
 		end
 	end
@@ -119,4 +143,3 @@ class IRCParser
 		end
 	end
 end
-		

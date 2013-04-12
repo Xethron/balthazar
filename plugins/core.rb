@@ -12,7 +12,7 @@ class Core
 
 	# Messaging commands
 	def message( nick, user, host, from, msg, arguments, con )
-		if( @config.auth( host, con ) )
+		if( @config.auth( user, host, con ) )
 			if( !arguments.nil? && !arguments.empty? )
 				to, message = arguments.split( ' ', 2 )
 			end
@@ -30,7 +30,7 @@ class Core
 	end
 
 	def raw( nick, user, host, from, msg, arguments, con )
-		if( @config.auth( host, con ) )
+		if( @config.auth( user, host, con ) )
 			if( !arguments.nil? && !arguments.empty? )
 				@irc.raw( arguments )
 			else
@@ -44,7 +44,7 @@ class Core
 	end
 
 	def action( nick, user, host, from, msg, arguments, con )
-		if( @config.auth( host, con ) )
+		if( @config.auth( user, host, con ) )
 			if( !arguments.nil? && !arguments.empty? )
 				to, action = arguments.split( ' ', 2 )
 			end
@@ -62,7 +62,7 @@ class Core
 	end
 
 	def notice( nick, user, host, from, msg, arguments, con )
-		if( @config.auth( host, con ) )
+		if( @config.auth( user, host, con ) )
 			if( !arguments.nil? && !arguments.empty? )
 				to, message = arguments.split( ' ', 2 )
 			end
@@ -81,7 +81,7 @@ class Core
 
 	# Join/part commands
 	def join( nick, user, host, from, msg, chan, con )
-		if( @config.auth( host, con ) )
+		if( @config.auth( user, host, con ) )
 			if( !chan.nil? && !chan.empty? )
 				@irc.join( chan )
 			else
@@ -95,7 +95,7 @@ class Core
 	end
 
 	def part( nick, user, host, from, msg, chan, con )
-		if( @config.auth( host, con ) )
+		if( @config.auth( user, host, con ) )
 			if( !chan.nil? && !chan.empty? )
 				@irc.part( chan )
 			else
@@ -110,7 +110,7 @@ class Core
 
 	# Topic command
 	def topic( nick, user, host, from, msg, arguments, con )
-		if( @config.auth( host, con ) )
+		if( @config.auth( user, host, con ) )
 			if( !arguments.nil? && !arguments.empty? )
 				chan, topic = arguments.split( ' ', 2 )
 				if( chan !~ /^#/ && !con )
@@ -132,7 +132,7 @@ class Core
 
 	# Mode command
 	def mode( nick, user, host, from, msg, arguments, con )
-		if( @config.auth( host, con ) )
+		if( @config.auth( user, host, con ) )
 			if( arguments == nil )
 				arguments = ""
 			end
@@ -157,7 +157,7 @@ class Core
 
 	# Oper commands
 	def op( nick, user, host, from, msg, arguments, con )
-		if( @config.auth( host, con ) )
+		if( @config.auth( user, host, con ) )
 			if( arguments == nil )
 				arguments = ""
 			end
@@ -184,7 +184,7 @@ class Core
 	end
 
 	def deop( nick, user, host, from, msg, arguments, con )
-		if( @config.auth( host, con ) )
+		if( @config.auth( user, host, con ) )
 			if( arguments == nil )
 				arguments = ""
 			end
@@ -212,7 +212,7 @@ class Core
 
 	# Half-oper commands
 	def hop( nick, user, host, from, msg, arguments, con )
-		if( @config.auth( host, con ) )
+		if( @config.auth( user, host, con ) )
 			if( arguments == nil )
 				arguments = ""
 			end
@@ -239,7 +239,7 @@ class Core
 	end
 
 	def dehop( nick, user, host, from, msg, arguments, con )
-		if( @config.auth( host, con ) )
+		if( @config.auth( user, host, con ) )
 			if( arguments == nil )
 				arguments = ""
 			end
@@ -267,7 +267,7 @@ class Core
 
 	# Voice commands
 	def voice( nick, user, host, from, msg, arguments, con )
-		if( @config.auth( host, con ) )
+		if( @config.auth( user, host, con ) )
 			if( arguments == nil )
 				arguments = ""
 			end
@@ -294,7 +294,7 @@ class Core
 	end
 
 	def devoice( nick, user, host, from, msg, arguments, con )
-		if( @config.auth( host, con ) )
+		if( @config.auth( user, host, con ) )
 			if( arguments == nil )
 				arguments = ""
 			end
@@ -322,7 +322,7 @@ class Core
 
 	# Kick commands
 	def kick( nick, user, host, from, msg, arguments, con )
-		if( @config.auth( host, con ) )
+		if( @config.auth( user, host, con ) )
 			if( !arguments.nil? && !arguments.empty? )
 				if( arguments =~ /^#/ )
 					chan, name, reason = arguments.split( ' ', 3 )
@@ -348,7 +348,7 @@ class Core
 
 	# Banning commands
 	def ban( nick, user, host, from, msg, arguments, con )
-		if( @config.auth( host, con ) )
+		if( @config.auth( user, host, con ) )
 			if( !arguments.nil? && !arguments.empty? )
 				chan, host = arguments.split( ' ', 2 )
 			end
@@ -369,7 +369,7 @@ class Core
 	end
 
 	def unban( nick, user, host, from, msg, arguments, con )
-		if( @config.auth( host, con ) )
+		if( @config.auth( user, host, con ) )
 			if( !arguments.nil? && !arguments.empty? )
 				chan, host = arguments.split( ' ', 2 )
 			end
@@ -390,7 +390,7 @@ class Core
 	end
 
 	def timeban( nick, user, host, from, msg, arguments, con )
-		if( @config.auth( host, con ) )
+		if( @config.auth( user, host, con ) )
 			if( @config.threads && @status.threads )
 				if( !arguments.nil? && !arguments.empty? )
 					chan, host, timeout = arguments.split( ' ', 3 )
@@ -449,7 +449,7 @@ class Core
 	end
 
 	def nick( nick, user, host, from, msg, arguments, con )
-		if( @config.auth( host, con ) )
+		if( @config.auth( user, host, con ) )
 			if( !arguments.nil? && !arguments.empty? )
 				@config.nick( arguments )
 				@irc.nick( arguments )

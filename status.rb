@@ -15,6 +15,57 @@ class Status
 		@reconnect	= 1
 		@plugins	= {}
 		@startup	= Time.new
+		
+		#Server Vars
+		@nick		= ""
+		@user		= ""
+		@host		= ""
+		@server		= ""
+		@motd		= Array.new
+	end
+	
+	# Some basic server vars...
+	def nick( nick = "" )
+		if( nick != "" )
+			@nick = nick
+		end
+		return @nick
+	end
+	
+	def user( user = "" )
+		if( user != "" )
+			@user = user
+		end
+		return @user
+	end
+	
+	def host( host = "" )
+		if( host != "" )
+			@host = host
+		end
+		return @host
+	end
+	
+	def server( server = "" )
+		if( server != "" )
+			@server = server
+		end
+		return @server
+	end
+	
+	def motd( motd = "" )
+		if( motd != "" )
+			@motd[@motd.size] = motd
+			if( motd[@motd.size-1] == "#EOMOTD#" )
+				return @motd
+			else
+				return ["No Valid MOTD"] #Returns in Array format
+			end
+		end
+	end
+	
+	def motdclear
+		@motd.clear
 	end
 
 	# Get/set functions

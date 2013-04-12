@@ -122,7 +122,7 @@ class Commands
 
 	# Quit command
 	def quit( nick, user, host, from, msg )
-		if( @config.auth( host, con ) )
+		if( @config.auth( user, host, con ) )
 			if( con )		
 				@output.cbad( "This will also stop the bot, are you sure? [y/N]: " )
 				STDOUT.flush
@@ -152,7 +152,7 @@ class Commands
 
 	# Load modules
 	def load( nick, user, host, from, msg, auto = false )
-		if( @config.auth( host, con ) )
+		if( @config.auth( user, host, con ) )
 			cmd, plugin = msg.split( ' ', 2 )
 			if( plugin != nil )
 				# Clean variable
@@ -220,7 +220,7 @@ class Commands
 
 	# Unload module
 	def unload( nick, user, host, from, msg )
-		if( @config.auth( host, con ) )
+		if( @config.auth( user, host, con ) )
 			cmd, plugin = msg.split( ' ', 2 )
 			if( plugin != nil )
 				# Clean variable

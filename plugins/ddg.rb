@@ -11,7 +11,7 @@ class Ddg
 		@irc		= irc
 		@timer		= timer
 
-		@channel	= "#ddg"
+		@channel	= "#XethBot"
 	end
 	
 	# Method that receives a notification when a user joins (optional)

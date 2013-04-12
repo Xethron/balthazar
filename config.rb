@@ -2,33 +2,35 @@
 
 # Class used for initial bot configuration
 # Modify the following variables to your liking
+require "mysql"
+
 class Configuration
 	def initialize( status, output )
-		@nick		= "nanobot4"				# Bot nickname
-		@user		= "nanobot"					# IRC username
-		@pass		= ""						# NickServ password
-		@version	= "Nanobot 4 beta 2"		# Version
+		@nick		= "balthazar_dev"						# Bot nickname
+		@user		= "Balthasar"				# IRC username
+		@pass		= ""				# NickServ password
+		@version	= "Balthasar"				# Version
 
-		@command	= '\!'						# Character prefix for commands (escape special chars)
+		@command	= '\?'						# Character prefix for commands (escape special chars)
 
 		@server		= "irc.insomnia247.nl"		# IPv4 address
-		@server6	= "irc6.insomnia247.nl"		# IPv6 address
+		#@server6	= "irc6.insomnia247.nl"		# IPv6 address
 		@port		= 6667						# Normal port
 		@sslport	= 6697						# SSL port
 
 		@channels	= [ "#bot", "#test" ]
 												# Autojoin channel list
 
-		@opers		= [ "insomnia247.nl" ]
-												# Opers list
+		@opers		= [ "xethron@tuks.of.niks", "nick@hostname.org" ]
+												# Opers hostname list
 
 		@data		= "data"					# Data directory
 		@plugins	= "plugins"					# Plugin directory
-		@autoload	= [ "core", "ddg", "help", "identified", "login", "seen", "shells", "toolbox", "translate", "twitter" ]
+		@autoload	= [ "core", "ddg", "help", "identified", "seen","logs", "link", "choose", "stat", "top" ]
 												# Plugin autoload list
 
 		@antiflood	= true						# Attempt to mitigate people flooding bot with command
-		@floodtime	= 5							# Command spread that triggers flood protect (seconds)
+		@floodtime	= 1							# Command spread that triggers flood protect (seconds)
 
 		@throttle	= true						# Throttle output to avoid flooding from the bot
 
@@ -47,17 +49,151 @@ class Configuration
 												# Path to openssl root certs (Needed if verify_ssl is enabled)
 
 		@threadfb	= true						# Allow fallback to sequential processing when threads aren't available
-		@sslfback	= false						# Allow fallback to insecure connect when OpenSSL library isn't available
+		@sslfback	= true						# Allow fallback to insecure connect when OpenSSL library isn't available
+		
+		# MySQL Settings.....
+		@my_host		= "127.0.0.1"				# MySQL Server Address
+		@my_user		= "balthazar"					# MySQL Server Username
+		@my_pass		= ""				# MySQL Server Password
+		@my_db			= "balthazar"					# MySQL Database
+		@my_timezone	= "+2:00"					# MySQL Timezone
 
 		@status		= status					# System object, do not modify
 		@output		= output					# System object, do not modify
 	end
 
 	# Get/set methods
-	def nick( nick = "" )
-		if( nick != "" )
-			@nick = nick
+	
+	def connect
+		@output.std( "Connecting to MySQL .............. " )
+		begin
+			@my = Mysql::new(@my_host, @my_user, @my_pass, @my_db)
+			@output.good( "[OK]\n" )
+		rescue LoadError
+			@output.bad( "[NO]\n" )
+			@output.info( "Could not connect to MySQL Database. Please check settings in mysql.rb\n" )
 		end
+	end
+
+	def settimezone
+		@output.std( "Setting MySQL timezone ........... " )
+		begin
+			@my.query("SET time_zone = '#{@my_timezone}';" )
+			@output.good( "[OK]\n" )
+		rescue LoadError
+			@output.bad( "[NO]\n" )
+			@output.info( "Error setting MySQL Timezone. Timestamps may not be accurate.\n" )
+		end
+	end
+
+	def setnickhash
+		@output.std( "Creating Nick Hash ............... " )
+		begin
+			rows = @my.query("SELECT * FROM nicks")
+			@nickhash = Hash['5', 1]
+			rows.each do |row|
+				hashval=row[1]
+				nickhash[hashval.downcase] = row[0]
+			end
+			@output.good( "[OK]\n" )
+		rescue LoadError
+			@output.bad( "[NO]\n" )
+			@output.info( "Error creating Nick Hash.\n" )
+		end
+	end
+
+	def setuserhash
+		@output.std( "Creating User Hash ............... " )
+		begin
+			rows = @my.query("SELECT * FROM users")
+			@userhash = Hash['5', 1]
+			rows.each do |row|
+				hashval=row[1]
+				userhash[hashval.downcase] = row[0]
+			end
+			@output.good( "[OK]\n" )
+		rescue LoadError
+			@output.bad( "[NO]\n" )
+			@output.info( "Error creating User Hash.\n" )
+		end
+	end
+
+	def sethosthash
+		@output.std( "Creating Host Hash ............... " )
+		begin
+			rows = @my.query("SELECT * FROM hosts")
+			@hosthash = Hash['5', 1]
+			rows.each do |row|
+				hashval=row[1]
+				hosthash[hashval.downcase] = row[0]
+			end
+			@output.good( "[OK]\n" )
+		rescue LoadError
+			@output.bad( "[NO]\n" )
+			@output.info( "Error creating Host Hash.\n" )
+		end
+	end
+	
+	def setchanhash
+		@output.std( "Creating Chan Hash ............... " )
+		begin
+			rows = @my.query("SELECT * FROM chans")
+			@chanhash = Hash['5', 1]
+			rows.each do |row|
+				hashval=row[1]
+				chanhash[hashval.downcase] = row[0]
+			end
+			@output.good( "[OK]\n" )
+		rescue LoadError
+			@output.bad( "[NO]\n" )
+			@output.info( "Error creating Host Hash.\n" )
+		end
+	end
+	
+	def setwordhash
+		@output.std( "Creating Word Hash ............... " )
+		begin
+			rows = @my.query("SELECT * FROM words_")
+			@wordhash = Hash.new
+			rows.each do |row|
+				hashval=row[1]
+				wordhash[hashval.downcase][0] = row[0]
+				wordhash[hashval.downcase][1] = row[2]
+				wordhash[hashval.downcase][2] = row[3]
+			end
+			@output.good( "[OK]\n" )
+		rescue LoadError
+			@output.bad( "[NO]\n" )
+			@output.info( "Error creating Word Hash.\n" )
+		end
+	end
+	
+	def my
+		return @my
+	end
+	
+	def chanhash
+		return @chanhash
+	end
+	
+	def nickhash
+		return @nickhash
+	end
+	
+	def userhash
+		return @userhash
+	end
+	
+	def hosthash
+		return @hosthash
+	end
+	
+	def wordhash
+		return @wordhash
+	end
+	###################################################################################
+	
+	def nick
 		return @nick
 	end
 
@@ -72,10 +208,15 @@ class Configuration
 		return @user
 	end
 
-	def pass
-		@pass
-	end
+	#??????????? WHATS THIS?????
+	#def pass
+	#	@pass
+	#end 
 
+	def dbh
+		return @dbh
+	end
+	
 	def version
 		return @version
 	end
@@ -236,14 +377,13 @@ class Configuration
 	end
 
 	# Check for authorized users
-	def auth( host, console )
+	def auth( user, host, console )
 		admin = 0
-
 		if( console ) # No auth needed for console
 			admin = 1
 		else
 			@opers.each do |adminhost|
-				if( adminhost == host )
+				if( adminhost.downcase == "#{user}@#{host}".downcase )
 					admin = 1
 				end				
 			end

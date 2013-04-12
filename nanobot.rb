@@ -1,5 +1,17 @@
 #!/usr/bin/env ruby
 
+begin
+	require "mysql"
+rescue LoadError
+	raise LoadError, "Cannot load mysql library. Make sure the mysql gem is installed."
+end
+
+begin
+	require "raspell"
+rescue LoadError
+	raise LoadError, "Cannot load raspell library. Make sure the raspell gem is installed."
+end
+
 # Load support files
 require './config.rb'
 require './output.rb'
@@ -11,6 +23,7 @@ require './timer.rb'
 require './irc.rb'
 require './ircparser.rb'
 require './console.rb'
+#require './mysql.rb'
 
 # Create support objects
 status	= Status.new
@@ -36,6 +49,14 @@ startup.checkdirectoryplugins
 startup.checkdirectorydata
 
 startup = nil
+
+config.connect
+config.settimezone
+config.setnickhash
+config.setuserhash
+config.sethosthash
+config.setchanhash
+config.setwordhash
 
 # Show configuration, if desired.
 config.show

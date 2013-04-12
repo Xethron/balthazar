@@ -84,7 +84,7 @@ class Twitter
 
 	# Method to add users to follow
 	def follow( nick, user, host, from, msg, arguments, con )
-		if( @config.auth( host, con ) )
+		if( @config.auth( user, host, con ) )
 			if( @status.threads && @config.threads)
 				if( !arguments.nil? && !arguments.empty? )
 					arguments.gsub!( /&/, "" ) # Sanitize GET variables
@@ -129,7 +129,7 @@ class Twitter
 
 	# Method to delete users to follow
 	def unfollow( nick, user, host, from, msg, arguments, con )
-		if( @config.auth( host, con ) )
+		if( @config.auth( user, host, con ) )
 			if( @status.threads && @config.threads)
 				if( !arguments.nil? && !arguments.empty? )
 					arguments.gsub!( /&/, "" ) # Sanitize
@@ -165,7 +165,7 @@ class Twitter
 
 	# Method stop feed collection
 	def stop( nick, user, host, from, msg, arguments, con )
-		if( @config.auth( host, con ) )
+		if( @config.auth( user, host, con ) )
 			if( @status.threads && @config.threads)
 				@ftread.exit
 				line = "Feed collection stopped."
@@ -186,7 +186,7 @@ class Twitter
 
 	# Set channel for feeds
 	def channel( nick, user, host, from, msg, arguments, con )
-		if( @config.auth( host, con ) )
+		if( @config.auth( user, host, con ) )
 			if( !arguments.nil? && !arguments.empty? )
 				if( @status.threads && @config.threads)
 					@announce = arguments
