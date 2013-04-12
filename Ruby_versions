@@ -1,0 +1,16 @@
+Tested with Ruby versions:
+Ruby 1.8.7			(OT)
+Ruby 1.9
+Ruby 1.9.1
+Ruby 1.9.2
+Ruby 1.9.3
+Ruby 2.0.0dev
+jruby 1.1			(SSL)
+jruby 1.6.5
+Rubinius 2.0.0dev
+maglev 1.0.0		(SSL)(T)
+
+
+(OT)	= Output throttling must be disabled
+(SLL)	= SSL isn't supported or doesn't work properly
+(T)		= Threading doesn't work properly
